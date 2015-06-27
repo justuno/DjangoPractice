@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rango</title>
+    <!--如何導入js和css文件？如下所示-->
+    <!--<link rel="stylesheet" href="{% static "css/base.css" %}" />-->
+    <!--<script src="{% static "js/jquery.js" %}"></script>-->
+</head>
+<body>
+    <h1>Rango says...</h1>
+    hello world! <em>{{ boldmessage }}</em><br />
+    <a href="/rango/about/">About</a><br />
+    <img src = '{% static "images/feilong.png" %}' alt='There should be a picture.' />
+</body>
+</html>
