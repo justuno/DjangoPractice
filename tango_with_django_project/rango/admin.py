@@ -5,7 +5,13 @@ from rango.models import Category, Page
 class PageAdmin(admin.ModelAdmin):
     list_display = ('title', 'category', 'url')
 
+# Add in this class to customized the Admin Interface
+# 後臺添加一個新的category時，填寫名字的時候，slug會自動填寫相同的字符
+class CategoryAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('name', )}
+
 # Register your models here.
 # This will register the models with the admin interface.
-admin.site.register(Category)
+# Update the registeration to include this customised interface
+admin.site.register(Category, CategoryAdmin)
 admin.site.register(Page, PageAdmin)

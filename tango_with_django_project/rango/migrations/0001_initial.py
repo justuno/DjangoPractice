@@ -13,17 +13,21 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Category',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, primary_key=True, auto_created=True)),
-                ('name', models.CharField(unique=True, max_length=128)),
+                ('id', models.AutoField(primary_key=True, serialize=False, auto_created=True, verbose_name='ID')),
+                ('name', models.CharField(max_length=128, unique=True)),
+                ('views', models.IntegerField(default=0)),
+                ('likes', models.IntegerField(default=0)),
+                ('slug', models.SlugField(unique=True)),
             ],
             options={
+                'verbose_name_plural': 'categories',
             },
             bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Page',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, primary_key=True, auto_created=True)),
+                ('id', models.AutoField(primary_key=True, serialize=False, auto_created=True, verbose_name='ID')),
                 ('title', models.CharField(max_length=128)),
                 ('url', models.URLField()),
                 ('views', models.IntegerField(default=0)),
