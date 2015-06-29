@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>About</title>
-</head>
-<body>
+{% extends 'rango/base.html' %}
+
+{% load staticfiles %}
+
+{% block title %}{% endblock %}
+{% block body_block %}
     <h1>Shit, FUCK YOU!</h1>
-    <img src = '{% static images/bangfeng.png %}' alt="There should be a picture." />
-</body>
-</html>
+    <img src = '{% static "images/bangfeng.png" %}' alt="There should be a picture." />
+    <br />
+    <a href="{% url 'index' %}">Index</a>
+{% endblock %}
