@@ -6,10 +6,10 @@ from rango.forms import CategoryForm, PageForm
 from rango.forms import UserForm, UserProfileForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from datetime import datetime
 
 
 # Create your views here.
-
 @login_required
 def restricted(request):
     return HttpResponse("Since you're logged in, you can see this text!")
@@ -23,28 +23,106 @@ def user_logout(request):
     # Take the user back to the homepage.
     return HttpResponseRedirect('/rango/')
 
+# see chapter 11
+# cookies type
+# def index(request):
+#     # request.session.set_test_cookie()
+#     # Query the database for a list of ALL categories currently stored.
+#     # Order the categories by no. likes in descending order.
+#     # Retrieve the top 5 only - or all if less than 5.
+#     # Place the list in our context_dict dictionary which will be passed to the template engine.
+#     # 教程有誤，AssertionError: Negative indexing is not supported.
+#     category_list = Category.objects.order_by('-likes')[0:5]
+#     # category_list = Category.objects.all()
+#     # Construct a dictionary to pass to the template engine as its context.
+#     # Note the key boldmessage is the same as {{ boldmessage }} in the template!
+#     # context_dict = {'boldmessage': "I am bold font from the context"}
+#
+#     context_dict = {'categories': category_list}
+#
+#     top5pages = Page.objects.order_by('-views')[0:5]
+#     context_dict['top5pages'] = top5pages
+#
+#     # Get the number of visits to the site.
+#     # We use the COOKIES.get() function to obtain the visits cookie.
+#     # If the cookie exists, the value returned is casted to an integer.
+#     # If the cookie doesn't exist, we default to zero and cast that.
+#     visits = int(request.COOKIES.get('visits', '1'))
+#     context_dict['visits'] = visits
+#
+#     reset_last_visit_time = False
+#     response = render(request, 'rango/index.html', context_dict)
+#     # Does the cookie last_visit exist?
+#     if 'last_visit' in request.COOKIES:
+#         # Yes it does! Get the cookie's value.
+#         last_visit = request.COOKIES['last_visit']
+#         # Cast the value to a Python date/time object.
+#         last_visit_time = datetime.strptime(last_visit[:-7], "%Y-%m-%d %H:%M:%S")
+#
+#         # If it's been more than a day since the last visit...
+#         if (datetime.now() - last_visit_time).days > 0:
+#             visits += 1
+#             # ...and flag that the cookie last visit needs to be updated
+#             reset_last_visit_time = True
+#     else:
+#         # Cookie last_visit doesn't exist, so flag that it should be set.
+#         reset_last_visit_time = True
+#
+#         context_dict['visits'] = visits
+#
+#         # Obtain our Response object early so we can add cookie information.
+#         response = render(request, 'rango/index.html', context_dict)
+#
+#     if reset_last_visit_time:
+#         response.set_cookie('last_visit', datetime.now())
+#         response.set_cookie('visits', visits)
+#
+#     # Return response back to the user, updating any cookies that need changed.
+#     return response
+
+# session type
+# Clearing the Sessions Database python manage.py clearsessions
 def index(request):
-    request.session.set_test_cookie()
-    # Query the database for a list of ALL categories currently stored.
-    # Order the categories by no. likes in descending order.
-    # Retrieve the top 5 only - or all if less than 5.
-    # Place the list in our context_dict dictionary which will be passed to the template engine.
-    # 教程有誤，AssertionError: Negative indexing is not supported.
-    category_list = Category.objects.order_by('-likes')[0:5]
-    # Construct a dictionary to pass to the template engine as its context.
-    # Note the key boldmessage is the same as {{ boldmessage }} in the template!
-    # context_dict = {'boldmessage': "I am bold font from the context"}
 
-    context_dict = {'categories': category_list}
+    category_list = Category.objects.order_by('-likes')[:5]
+    page_list = Page.objects.order_by('-views')[:5]
 
-    top5pages = Page.objects.order_by('-views')[0:5]
-    context_dict['top5pages'] = top5pages
+    context_dict = {'categories': category_list, 'pages': page_list}
 
-    return render(request, 'rango/index.html', context_dict)
+    visits = request.session.get('visits')
+    if not visits:
+        visits = 1
+    reset_last_visit_time = False
+
+    last_visit = request.session.get('last_visit')
+    if last_visit:
+        last_visit_time = datetime.strptime(last_visit[:-7], "%Y-%m-%d %H:%M:%S")
+
+        if (datetime.now() - last_visit_time).seconds > 5:
+            # ...reassign the value of the cookie to +1 of what it was before...
+            visits += 1
+            # ...and update the last visit cookie, too.
+            reset_last_visit_time = True
+    else:
+        # Cookie last_visit doesn't exist, so create it to the current date/time.
+        reset_last_visit_time = True
+
+    if reset_last_visit_time:
+        request.session['last_visit'] = str(datetime.now())
+        request.session['visits'] = visits
+    context_dict['visits'] = visits
+    response = render(request,'rango/index.html', context_dict)
+
+    return response
 
 def about(request):
+
+    if request.session.get('visits'):
+        count = request.session.get('visits')
+    else:
+        count = 1
     # return HttpResponse('Rango says here is the about page.<br /><a href="/rango/">Index</a>')
-    return render(request, 'rango/about.html', {})
+    return render(request, 'rango/about.html', {'visits': count})
 
 def category(request, category_name_slug):
     # Create a context dictionary which we can pass to the template rendering engine.
@@ -129,9 +207,9 @@ def add_page(request, category_name_slug):
     return render(request, 'rango/add_page.html', context_dict)
 
 def register(request):
-    if request.session.test_cookie_worked():
-        print(">>>> TEST COOKIE WORKED!")
-        request.session.delete_test_cookie()
+    # if request.session.test_cookie_worked():
+    #     print(">>>> TEST COOKIE WORKED!")
+    #     request.session.delete_test_cookie()
     # A boolean value for telling the template whether the registration was successful.
     # Set to False initially. Code changes value to True when registration succeeds.
     registered = False

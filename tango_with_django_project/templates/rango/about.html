@@ -2,10 +2,13 @@
 
 {% load staticfiles %}
 
-{% block title %}{% endblock %}
+{% block title %}About{% endblock %}
 {% block body_block %}
+<div class="page-header">
     <h1>Shit, FUCK YOU!</h1>
+    <p>visits: {{ visits }}</p>
     <img src = '{% static "images/bangfeng.png" %}' alt="There should be a picture." />
     <br />
     <a href="{% url 'index' %}">Index</a>
+</div>
 {% endblock %}

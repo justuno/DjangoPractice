@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'bootstrap_toolkit',
     'rango',
 )
 
@@ -84,6 +85,12 @@ USE_L10N = True
 USE_TZ = True
 
 LOGIN_URL = '/rango/login/'
+
+# if True, turn to browser-length sessions ,which expire when the user closes his or her browser.
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# (2 weeks, in seconds default)
+SESSION_COOKIE_AGE = 1209600
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/

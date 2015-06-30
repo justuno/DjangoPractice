@@ -2,45 +2,53 @@
 
 {% load staticfiles %}
 
-{% block title %}{% endblock %}
-
 <!--如何導入js和css文件？如下所示-->
 <!--<link rel="stylesheet" href="{% static "css/base.css" %}" />-->
 <!--<script src="{% static "js/jquery.js" %}"></script>-->
 
+{% block title %}Index{% endblock %}
+
 {% block body_block %}
-
-<!--We can tell from this object if the user is logged in (authenticated).
-If he or she is logged in, we can also obtain details about him or her.-->
 {% if user.is_authenticated %}
-<h1>Rango says... hello {{ user.username }}!</h1>
-{% else %}
-<h1>Rango says... hello world!</h1>
-{% endif %}
-<!--<em>{{ boldmessage }}</em><br />-->
-<!--<a href="/rango/login/">Login</a><br />-->
-<!--<a href="/rango/register/">Register Here</a>-->
-{% if categories %}
-    <h2>Top 5 most liked pages:</h2>
-    <ul>
-        {% for category in categories %}
-        <!--<li><a href="/rango/category/{{ category.slug }}">{{ category.name }}</a></li>-->
-        <li><a href="{% url 'category'  category.slug %}">{{ category.name }}</a></li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <strong>There are no categories present.</strong>
-{% endif %}
-
-{% if top5pages %}
-    <h2>Top 5 most viewed pages:</h2>
-    <ol>
-        {% for page in top5pages %}
-            <li><a href="{{ page.url }}">{{ page.title }}</a></li>
-        {% endfor %}
-    </ol>
-{% else %}
-    <strong>There are not top 5 most viewed pages.</strong>
-{% endif %}
-<!--<img src = '{% static "images/feilong.png" %}' alt='There should be a picture.' />-->
+<div class="page-header">
+        <h1>Rango says... hello {{ user.username }}!</h1>
+    {% else %}
+        <h1>Rango says... hello world!</h1>
+    {% endif %}
+</div>
+<div class="row placeholders">
+    <div class="col-xs-12 col-sm-6 placeholder">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Categories</h3>
+            </div>
+        </div>
+        {% if categories %}
+            <ul class="list-group">
+                {% for category in categories %}
+                 <li class="list-group-item"><a href="{% url 'category'  category.slug %}">{{ category.name }}</a></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <strong>There are no categories present.</strong>
+        {% endif %}
+    </div>
+    <div class="col-xs-12 col-sm-6 placeholder">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Pages</h3>
+            </div>
+        </div>
+        {% if pages %}
+            <ul class="list-group">
+                {% for page in pages %}
+                 <li class="list-group-item"><a href="{{page.url}}">{{ page.title }}</a></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <strong>There are no categories present.</strong>
+        {% endif %}
+    </div>
+</div>
+<p> visits: {{ visits }}</p>
 {% endblock %}

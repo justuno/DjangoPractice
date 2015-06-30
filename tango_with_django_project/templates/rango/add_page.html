@@ -3,11 +3,12 @@
 {% block title %}{% endblock %}
 
 {% block body_block %}
+<div class="page-header">
 {% if user.is_authenticated %}
     {% if category %}
-        <h1>Add a Page to {{ category.name }}</h1>
+        <h2 class="form-signin-heading">Add a Page to <a href="{% url 'category' category.slug %}">{{ category.name }}</a></h2>
         <!--必須在action那裡加上/add_page/，否則新的page不能加載進去-->
-        <form target="_self" id="page_form" method="post" action="{% url 'add_page' category_name_slug %}">
+        <form role="form" id="page_form" method="post" action="{% url 'add_page' category_name_slug %}">
             {% csrf_token %}
             {% for hidden in form.hidden_fields %}
                 {{ hidden }}
@@ -19,8 +20,8 @@
                 {{ field.help_text }}
                 {{ field }}
             {% endfor %}
-
-            <input type="submit" name="submit" value="Create Page" />
+            <br /><br />
+            <button class="btn btn-primary" type="submit" name="submit">Add Page</button>
         </form>
     {% else %}
         <strong>A category by this name does not exist.</strong>
@@ -30,4 +31,5 @@
 <!--<a href="/rango/">Index</a>-->
 <a href="{% url 'index' %}">Index</a>
 {% endif %}
+</div>
 {% endblock %}
