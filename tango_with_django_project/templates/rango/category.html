@@ -9,7 +9,7 @@
     {% if pages %}
     <ul>
         {% for page in pages %}
-        <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+            <li><a href="{% url 'goto' %}?page_id={{ page.id }}">{{ page.title }}</a>({{ page.views }} views)</li>
         {% endfor %}
     </ul>
     {% else %}
@@ -20,5 +20,7 @@
 {% else %}
     The specified category {{ category_name }} does not exist!
 {% endif %}
+    <br /><br />
+    <p>visits: {{ visits }}</p>
 </div>
 {% endblock %}

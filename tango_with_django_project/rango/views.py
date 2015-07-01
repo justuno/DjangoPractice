@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse
 from rango.models import Category, Page
@@ -10,10 +10,6 @@ from datetime import datetime
 
 
 # Create your views here.
-@login_required
-def restricted(request):
-    return HttpResponse("Since you're logged in, you can see this text!")
-
 # Use the login_required() decorator to ensure only those logged in can access the view.
 @login_required
 def user_logout(request):
@@ -22,6 +18,22 @@ def user_logout(request):
 
     # Take the user back to the homepage.
     return HttpResponseRedirect('/rango/')
+
+def track_url(request):
+
+    url = '/rango/'
+    if request.method == 'GET':
+        if 'page_id' in request.GET:
+            page_id = request.GET['page_id']
+            try:
+                page = Page.objects.get(id=page_id)
+                page.views += 1
+                page.save()
+                url = page.url
+            except Exception as e:
+                print(e)
+
+    return redirect(url)
 
 # see chapter 11
 # cookies type
@@ -137,7 +149,9 @@ def category(request, category_name_slug):
 
         # Retrieve all of the associated pages.
         # Note that filter returns >= 1 model instance.
-        pages = Page.objects.filter(category=category)
+        # pages = Page.objects.filter(category=category)
+
+        pages = Page.objects.filter(category=category).order_by('-views')
 
         # Adds our results list to the template context under name pages.
         context_dict['pages'] = pages
@@ -145,6 +159,30 @@ def category(request, category_name_slug):
         # We'll use this in the template to verify that the category exists.
         context_dict['category'] = category
         context_dict['category_name_slug'] = category_name_slug
+
+        visits = request.session.get(category.name + 'visits')
+        if not visits:
+            visits = 1
+        reset_last_visit_time = False
+
+        last_visit = request.session.get('last_' + category.name + '_visit')
+        if last_visit:
+            last_visit_time = datetime.strptime(last_visit[:-7], "%Y-%m-%d %H:%M:%S")
+
+            if (datetime.now() - last_visit_time).seconds > 5:
+                # ...reassign the value of the cookie to +1 of what it was before...
+                visits += 1
+                # ...and update the last visit cookie, too.
+                reset_last_visit_time = True
+        else:
+            # Cookie last_visit doesn't exist, so create it to the current date/time.
+            reset_last_visit_time = True
+
+        if reset_last_visit_time:
+            request.session['last_' + category.name + '_visit'] = str(datetime.now())
+            request.session[category.name + 'visits'] = visits
+        context_dict['visits'] = visits
+
     except Category.DoesNotExist:
         # We get here if we didn't find the specified category.
         # Don't do anything - the template displays the "no category" message for us.
@@ -199,8 +237,8 @@ def add_page(request, category_name_slug):
                 page.save()
                 # probably better to use a redirect here.
                 return category(request, category_name_slug)
-        # else:
-        #     print(form.errors)
+        else:
+            print(form.errors)
     else:
         form = PageForm()
     context_dict = {'form': form, 'category': cat, 'category_name_slug': category_name_slug}
