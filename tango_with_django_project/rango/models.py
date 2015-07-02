@@ -43,3 +43,11 @@ class UserProfile(models.Model):
     # Override the __str__() method to return out something meaningful!
     def __str__(self):
         return self.user.username
+
+class UserLike(models.Model):
+
+    uname = models.CharField(max_length=128)
+    cname = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.uname + '_likes_' + self.cname

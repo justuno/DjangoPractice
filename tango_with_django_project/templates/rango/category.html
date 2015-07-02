@@ -17,10 +17,17 @@
     {% endif %}
     <!--<a href="/rango/category/{{ category_name_slug }}/add_page/">Add a Page</a>-->
     <a href="{% url 'add_page' category_name_slug %}">Add a Page</a>
+    <br /><br />
+    <p>visits: {{ visits }}</p>
+    {% if user.is_authenticated %}
+    <div id="like_status">
+        <p><strong id="like_count">{{ category.likes }}</strong> people like this category.</p>
+        <button data-catid="{{ category.id }}" data-username="{{ user.username }}" class="btn btn-primary" type="button" id="likes">
+        Like Button</button>
+    </div>
+    {% endif %}
 {% else %}
     The specified category {{ category_name }} does not exist!
 {% endif %}
-    <br /><br />
-    <p>visits: {{ visits }}</p>
 </div>
 {% endblock %}

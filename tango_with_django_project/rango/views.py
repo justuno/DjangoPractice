@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse
-from rango.models import Category, Page
+from rango.models import Category, Page, UserLike
 from rango.forms import CategoryForm, PageForm
 from rango.forms import UserForm, UserProfileForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from datetime import datetime
+from django.core.exceptions import ObjectDoesNotExist
 
 
 # Create your views here.
@@ -343,3 +344,28 @@ def user_login(request):
         # No context variables to pass to the template system, hence the
         # blank dictionary object...
         return render(request, 'rango/login.html', {})
+
+@login_required
+def like_category(request):
+
+    cat_id = None
+    if request.method == 'GET':
+        cat_id = request.GET['category_id']
+
+    likes = 0
+    if cat_id:
+        cat = Category.objects.get(id=int(cat_id))
+        catname = cat.slug
+        username = request.GET['likeuser']
+        shit = UserLike.objects.filter(uname=username).filter(cname=catname)
+        if len(shit):
+            return HttpResponse('VOTED')
+        else:
+            if cat:
+                likes = cat.likes + 1
+                cat.likes = likes
+                cat.save()
+                userlike = UserLike.objects.create(uname=username, cname=catname)
+                print(userlike.uname, userlike.cname)
+
+    return HttpResponse(likes)

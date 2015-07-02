@@ -1,5 +1,5 @@
 from django.contrib import admin
-from rango.models import Category, Page
+from rango.models import Category, Page, UserLike
 from rango.models import UserProfile
 
 # 修改admin的pages頁面，詳見官方入門教程第二章
@@ -17,3 +17,4 @@ class CategoryAdmin(admin.ModelAdmin):
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Page, PageAdmin)
 admin.site.register(UserProfile)
+admin.site.register(UserLike)
